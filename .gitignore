@@ -1,0 +1,23 @@
+# Binaries / OS
+.DS_Store
+Thumbs.db
+*.zip
+*.sql
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+
+# Local env
+.env.local
+.env.*.local
+
+# Build outputs (when Next.js is added)
+node_modules/
+.next/
+out/
+dist/
