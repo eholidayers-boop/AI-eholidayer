@@ -281,7 +281,7 @@ You are eHolidayer AI, a personal travel advisor...
 - Never invent prices, availability, or hotel facts
 - Always cite specific hotel names, ratings, and numbers
 - If you recommend a hotel, explain why in 3-5 short bullets
-- Never exceed 3 sentences per turn unless explaining a recommendation
+- Keep all other replies to 3 sentences or fewer
 - If info is missing, ask only one question at a time
 ```
 
@@ -853,12 +853,14 @@ Foundation = "Done" when:
 
 ### 10.1 Functional
 
+- Guest (unauthenticated) user can complete the full foundation journey: search → refine → view hotel detail → read destination page
 - User can open homepage, type natural language, get back real hotels
 - Conversation refines (e.g. "cheaper" produces different results)
 - Click a hotel card → see real hotel detail with rooms, reviews, photos
 - Destination pages render with real data + SEO meta
 - Mock provider works offline; Anthropic provider works online
 - All 5 design system composite components are live on homepage or hotel detail
+- Traditional search page (`/search`) renders with conventional filters (basic filter chips; deep filter UX is sub-project 2)
 
 ### 10.2 Quality
 
