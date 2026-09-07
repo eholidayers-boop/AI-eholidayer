@@ -1,0 +1,18 @@
+[
+  {
+    "match": "hurghada",
+    "reply": "Great choice — Hurghada is wonderful for snorkeling. I'll show you stays with strong reviews on beach access.",
+    "tool": { "name": "search_hotels", "input": { "destination": "Hurghada" } },
+    "intent": { "destination": "Hurghada", "context": "couple" }
+  },
+  {
+    "match": "luxury|dubai|5-star",
+    "reply": "Looking for something special. I'll prioritize higher-rated properties.",
+    "intent": { "softPreferences": { "luxury": 9 } }
+  },
+  {
+    "match": ".*",
+    "reply": "Got it. Let me find a few options that fit.",
+    "tool": { "name": "search_hotels", "input": { "query": "DEFAULT" } }
+  }
+]
