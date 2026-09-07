@@ -1,3 +1,63 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Light theme (default) */
+:root {
+  --color-bg: #FBFAF7;
+  --color-bg-subtle: #F4F1EA;
+  --color-fg: #1A1814;
+  --color-fg-muted: #5C574D;
+  --color-border: #E5E0D6;
+  --color-accent: #2F5D50;
+  --color-accent-soft: #E8F0ED;
+  --color-warn: #C97A3D;
+  --color-error: #B0413E;
+  --color-success: #3F7D5C;
+  color-scheme: light;
+}
+
+/* System preference dark fallback */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #15130F;
+    --color-bg-subtle: #1F1C16;
+    --color-fg: #F4F1EA;
+    --color-fg-muted: #9A938A;
+    --color-border: #2D2924;
+    --color-accent: #5FA08C;
+    --color-accent-soft: #1E2E29;
+    --color-warn: #D88B4E;
+    --color-error: #D6625F;
+    --color-success: #5FA07C;
+    color-scheme: dark;
+  }
+}
+
+/* Explicit dark theme override */
+:root[data-theme="dark"] {
+  --color-bg: #15130F;
+  --color-bg-subtle: #1F1C16;
+  --color-fg: #F4F1EA;
+  --color-fg-muted: #9A938A;
+  --color-border: #2D2924;
+  --color-accent: #5FA08C;
+  --color-accent-soft: #1E2E29;
+  --color-warn: #D88B4E;
+  --color-error: #D6625F;
+  --color-success: #5FA07C;
+  color-scheme: dark;
+}
+
+html, body {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  font-family: 'Inter', system-ui, sans-serif;
+  margin: 0;
+}
+
+h1, h2, h3 {
+  font-family: 'Fraunces', serif;
+  font-optical-sizing: auto;
+  line-height: 1.15;
+}
