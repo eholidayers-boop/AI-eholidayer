@@ -13,6 +13,8 @@ export class AnthropicProvider implements AIProvider {
   }
 
   async *chat(input: ChatInput): AsyncIterable<ChatEvent> {
+    const { assertBudget } = await import('@/lib/security/tokenBudget');
+    await assertBudget();
     const stream = this.client.messages.stream({
       model: CHAT_MODEL,
       max_tokens: input.maxTokens ?? 1024,
@@ -29,6 +31,9 @@ export class AnthropicProvider implements AIProvider {
         yield { type: 'message_stop', reason: 'end_turn' };
       }
     }
+    const { recordUsage } = await import('@/lib/security/tokenBudget');
+    const inputLen = input.messages.reduce((n, m) => n + m.content.length, 0) + (input.system?.length ?? 0);
+    await recordUsage(Math.ceil(inputLen / 4) + 1024);
   }
 
   async extractIntent(messages: ChatMessage[]): Promise<Intent> {
