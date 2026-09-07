@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" version="3.0" method="upgrade">
+  <name>com_api</name>
+  <author>eHolidayer</author>
+  <version>1.0.0</version>
+  <description>Read-only REST shim for the AI-native frontend.</description>
+  <files folder="site">
+    <filename>api.php</filename>
+    <folder>controllers</folder>
+    <folder>models</folder>
+    <folder>language</folder>
+  </files>
+  <administration>
+    <files folder="admin"></files>
+  </administration>
+</extension>
