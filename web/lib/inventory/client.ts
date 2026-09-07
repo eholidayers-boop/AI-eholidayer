@@ -23,17 +23,9 @@ export class InventoryClient {
     for (let attempt = 0; attempt <= (this.opts.maxRetries ?? 2); attempt++) {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      let res: Response;
       try {
-        const res = await f(url, { ...init, headers, signal: ctrl.signal });
-        clearTimeout(timer);
-        if (!res.ok) {
-          if (res.status >= 500 && attempt < (this.opts.maxRetries ?? 2)) {
-            await new Promise(r => setTimeout(r, 200 * 2 ** attempt));
-            continue;
-          }
-          throw new Error(`Legacy ${res.status}: ${await res.text()}`);
-        }
-        return await res.json() as T;
+        res = await f(url, { ...init, headers, signal: ctrl.signal });
       } catch (err) {
         clearTimeout(timer);
         lastErr = err;
@@ -41,7 +33,17 @@ export class InventoryClient {
           await new Promise(r => setTimeout(r, 200 * 2 ** attempt));
           continue;
         }
+        throw lastErr;
       }
+      clearTimeout(timer);
+      if (!res.ok) {
+        if (res.status >= 500 && attempt < (this.opts.maxRetries ?? 2)) {
+          await new Promise(r => setTimeout(r, 200 * 2 ** attempt));
+          continue;
+        }
+        throw new Error(`Legacy ${res.status}: ${await res.text()}`);
+      }
+      return await res.json() as T;
     }
     throw lastErr ?? new Error('Unknown error');
   }
