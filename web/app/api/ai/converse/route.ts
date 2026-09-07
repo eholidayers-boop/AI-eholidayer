@@ -7,6 +7,7 @@ import { compressIfNeeded } from '@/lib/session/compress';
 import { InventoryClient } from '@/lib/inventory/client';
 import type { AIProvider, ChatEvent } from '@/lib/ai/provider';
 import type { ConversationState } from '@/lib/ai/intent';
+import { rateLimit } from '@/lib/security/rateLimit';
 
 export const runtime = 'nodejs';
 
@@ -33,6 +34,10 @@ export async function POST(req: NextRequest) {
     return new Response(JSON.stringify({ error: 'message_required' }), { status: 400 });
   }
   const sessionId = body.sessionId ?? crypto.randomUUID();
+  const sessionKey = body.sessionId ?? 'anon';
+  if (!(await rateLimit(sessionKey))) {
+    return new Response(JSON.stringify({ error: 'rate_limited' }), { status: 429 });
+  }
   const provider = pickProvider();
   const client = new InventoryClient(
     process.env.LEGACY_API_BASE_URL!,
