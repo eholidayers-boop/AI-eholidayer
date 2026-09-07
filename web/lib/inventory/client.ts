@@ -1,3 +1,4 @@
+import { cached } from './cache';
 import type { AvailabilityQuery, AvailabilityResult, Destination, Hotel, HotelDetail, RoomOption, Review, SearchQuery, User } from './types';
 
 export interface InventoryClientOptions {
@@ -53,15 +54,18 @@ export class InventoryClient {
     if (q.maxPrice) params.set('maxPrice', String(q.maxPrice));
     if (q.page) params.set('page', String(q.page));
     if (q.pageSize) params.set('pageSize', String(q.pageSize));
-    return this.fetchJson(`/api/v1/hotels?${params}`, {}, this.opts.timeoutMs?.search ?? 3000);
+    const key = `hotels:${JSON.stringify(q)}`;
+    return cached(key, 300, () => this.fetchJson(`/api/v1/hotels?${params}`, {}, this.opts.timeoutMs?.search ?? 3000));
   }
 
   getHotelDetails(id: string): Promise<{ hotel: HotelDetail }> {
-    return this.fetchJson(`/api/v1/hotels/${encodeURIComponent(id)}`, {}, this.opts.timeoutMs?.detail ?? 2000);
+    const key = `hotel:${id}`;
+    return cached(key, 600, () => this.fetchJson(`/api/v1/hotels/${encodeURIComponent(id)}`, {}, this.opts.timeoutMs?.detail ?? 2000));
   }
 
   getRoomOptions(id: string): Promise<{ rooms: RoomOption[] }> {
-    return this.fetchJson(`/api/v1/hotels/${encodeURIComponent(id)}/rooms`, {}, this.opts.timeoutMs?.detail ?? 2000);
+    const key = `rooms:${id}`;
+    return cached(key, 600, () => this.fetchJson(`/api/v1/hotels/${encodeURIComponent(id)}/rooms`, {}, this.opts.timeoutMs?.detail ?? 2000));
   }
 
   getAvailability(q: AvailabilityQuery): Promise<{ hotels: AvailabilityResult[] }> {
@@ -75,11 +79,12 @@ export class InventoryClient {
     if (filter.hotelId) params.set('hotelId', filter.hotelId);
     if (filter.destination) params.set('destination', filter.destination);
     if (filter.minRating) params.set('minRating', String(filter.minRating));
-    return this.fetchJson(`/api/v1/reviews?${params}`, {}, this.opts.timeoutMs?.detail ?? 2000);
+    const key = `reviews:${JSON.stringify(filter)}`;
+    return cached(key, 600, () => this.fetchJson(`/api/v1/reviews?${params}`, {}, this.opts.timeoutMs?.detail ?? 2000));
   }
 
   getDestinations(): Promise<{ destinations: Destination[] }> {
-    return this.fetchJson(`/api/v1/destinations`);
+    return cached('destinations:all', 3600, () => this.fetchJson(`/api/v1/destinations`));
   }
 
   async login(email: string, password: string): Promise<{ token: string; user: User }> {
