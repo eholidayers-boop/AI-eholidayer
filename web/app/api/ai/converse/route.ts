@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { AnthropicProvider } from '@/lib/ai/anthropic';
 import { MockProvider } from '@/lib/ai/mock';
 import { runToolLoop, type ToolLoopResult } from '@/lib/ai/toolLoop';
 import { getSession, saveSession } from '@/lib/session/store';
@@ -20,7 +20,7 @@ function pickProvider(): AIProvider {
     }
     return new MockProvider();
   }
-  return new Anthropic(process.env.ANTHROPIC_API_KEY);
+  return new AnthropicProvider(process.env.ANTHROPIC_API_KEY);
 }
 
 function sseEncode(event: string, data: unknown): string {

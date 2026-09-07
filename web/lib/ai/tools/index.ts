@@ -23,3 +23,9 @@ export type GetHotelDetailsInput = z.infer<typeof getHotelDetailsSchema>;
 export type GetRoomOptionsInput = z.infer<typeof getRoomOptionsSchema>;
 export type GetAvailabilityInput = z.infer<typeof getAvailabilitySchema>;
 export type GetDestinationInfoInput = z.infer<typeof getDestinationInfoSchema>;
+
+export { searchHotelsDefinition, executeSearchHotels } from './searchHotels';
+export { getHotelDetailsDefinition, executeGetHotelDetails } from './getHotelDetails';
+export { getRoomOptionsDefinition, executeGetRoomOptions } from './getRoomOptions';
+export { getAvailabilityDefinition, executeGetAvailability } from './getAvailability';
+export { getDestinationInfoDefinition, executeGetDestinationInfo } from './getDestinationInfo';
