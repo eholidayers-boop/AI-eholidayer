@@ -5,6 +5,14 @@ vi.mock('@anthropic-ai/sdk', () => ({
   default: class { messages = { stream: createMock }; }
 }));
 
+vi.mock('@vercel/kv', () => ({
+  kv: {
+    get: vi.fn().mockResolvedValue(0),
+    incrby: vi.fn().mockResolvedValue(0),
+    expire: vi.fn().mockResolvedValue(1)
+  }
+}));
+
 import { AnthropicProvider } from '@/lib/ai/anthropic';
 
 describe('AnthropicProvider', () => {

@@ -4,6 +4,7 @@ vi.mock('@vercel/kv', () => ({
   kv: {
     get: vi.fn().mockResolvedValue(null),
     set: vi.fn().mockResolvedValue('OK'),
+    incr: vi.fn().mockResolvedValue(1),
     expire: vi.fn().mockResolvedValue(1)
   }
 }));
