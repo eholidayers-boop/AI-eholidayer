@@ -1,4 +1,5 @@
-import { AIHeroInput } from '@/components/composite/AIHeroInput';
+import Link from 'next/link';
+import { AIChatPanel } from '@/components/composite/AIChatPanel';
 
 const TRUST_TILES = [
   'Personalized recommendations',
@@ -13,7 +14,7 @@ export default function HomePage() {
       <header className="mx-auto flex max-w-7xl items-center justify-between p-6">
         <span className="font-display text-2xl text-fg">eHolidayer</span>
         <nav className="flex gap-6 text-sm text-fg-muted">
-          <a href="#" className="hover:text-fg">Explore</a>
+          <Link href="/search" className="hover:text-fg">Search</Link>
           <a href="#" className="hover:text-fg">My Trips</a>
           <a href="#" className="hover:text-fg">Login</a>
           <span>EN / USD</span>
@@ -22,15 +23,15 @@ export default function HomePage() {
 
       <section className="relative isolate overflow-hidden bg-fg text-bg">
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-fg to-bg-subtle opacity-90" aria-hidden="true" />
-        <div className="mx-auto max-w-7xl px-6 py-24 text-center">
-          <h1 className="font-display text-5xl md:text-6xl tracking-tight">
+        <div className="mx-auto max-w-7xl px-6 py-20 text-center">
+          <h1 className="font-display text-4xl md:text-6xl tracking-tight">
             Tell me what kind of stay you're looking for.
           </h1>
           <p className="mt-4 text-lg text-bg/80">
             I'll find the hotels that fit you best.
           </p>
           <div className="mt-10">
-            <AIHeroInput />
+            <AIChatPanel />
           </div>
         </div>
       </section>
