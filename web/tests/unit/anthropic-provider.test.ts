@@ -1,0 +1,26 @@
+import { describe, it, expect, vi } from 'vitest';
+
+const createMock = vi.fn();
+vi.mock('@anthropic-ai/sdk', () => ({
+  default: class { messages = { stream: createMock }; }
+}));
+
+import { AnthropicProvider } from '@/lib/ai/anthropic';
+
+describe('AnthropicProvider', () => {
+  it('streams text_delta events from SDK events', async () => {
+    createMock.mockReturnValue({
+      async *[Symbol.asyncIterator]() {
+        yield { type: 'content_block_delta', delta: { type: 'text_delta', text: 'Hi' } };
+        yield { type: 'content_block_delta', delta: { type: 'text_delta', text: ' there' } };
+        yield { type: 'message_stop' };
+      }
+    });
+    const p = new AnthropicProvider('key');
+    const events = [];
+    for await (const e of p.chat({ messages: [{ role: 'user', content: 'hello' }] })) events.push(e);
+    expect(events).toContainEqual({ type: 'text_delta', text: 'Hi' });
+    expect(events).toContainEqual({ type: 'text_delta', text: ' there' });
+    expect(events).toContainEqual({ type: 'message_stop', reason: 'end_turn' });
+  });
+});
