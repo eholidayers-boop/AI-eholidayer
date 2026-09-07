@@ -18,7 +18,8 @@ export class AnthropicProvider implements AIProvider {
       max_tokens: input.maxTokens ?? 1024,
       temperature: input.temperature,
       system: input.system,
-      messages: input.messages.map(m => ({ role: m.role, content: m.content }))
+      messages: input.messages.map(m => ({ role: m.role, content: m.content })),
+      tools: input.tools
     } as any);
 
     for await (const event of stream) {
