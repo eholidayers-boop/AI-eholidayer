@@ -6,7 +6,7 @@ const SUMMARIZE_MODEL = process.env.ANTHROPIC_EXTRACT_MODEL ?? 'claude-haiku-4-5
 
 export async function compressIfNeeded(state: ConversationState): Promise<ConversationState> {
   if (state.messages.length <= MAX_MESSAGES) return state;
-  const headCount = 10;
+  const headCount = 30;
   const recent = state.messages.slice(-headCount);
   const older = state.messages.slice(0, -headCount);
   const summary = await summarize(older);
