@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { HotelCard } from '@/components/composite/HotelCard';
 import { Skeleton } from '@/components/ui/Skeleton';
 import type { Hotel } from '@/lib/inventory/types';
+import { trackEvent } from '@/lib/analytics/client';
 
 type ChatState = { role: 'user' | 'assistant'; content: string; hotels?: Hotel[] };
 
@@ -21,6 +22,7 @@ export function AIChatPanel() {
     setInput('');
     setStreaming(true);
     setMessages(m => [...m, { role: 'assistant', content: '' }]);
+    trackEvent('chat_started', { length: userMsg.length });
 
     const res = await fetch('/api/ai/converse', {
       method: 'POST',
@@ -61,6 +63,7 @@ export function AIChatPanel() {
       }
     }
     setStreaming(false);
+    trackEvent('chat_completed', { toolCalls: asstHotels.length > 0 ? 1 : 0 });
   }
 
   return (
