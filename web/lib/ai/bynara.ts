@@ -15,6 +15,10 @@ export class BynaraProvider implements AIProvider {
   async *chat(input: ChatInput): AsyncIterable<ChatEvent> {
     const { assertBudget } = await import('@/lib/security/tokenBudget');
     await assertBudget();
+    const tools = input.tools?.map((t: any) => ({
+      type: 'function',
+      function: { name: t.name, description: t.description, parameters: t.input_schema }
+    }));
     const res = await fetch(`${BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -29,52 +33,29 @@ export class BynaraProvider implements AIProvider {
           ...(input.system ? [{ role: 'system', content: input.system }] : []),
           ...input.messages.map(m => ({ role: m.role, content: m.content }))
         ],
-        tools: input.tools ?? undefined,
-        stream: true
+        tools: tools ?? undefined,
+        stream: false
       })
     });
 
-    if (!res.ok || !res.body) {
+    if (!res.ok) {
       yield { type: 'error', message: `bynara chat error ${res.status}` };
       return;
     }
-
-    const reader = res.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const parts = buffer.split('\n\n');
-      buffer = parts.pop() ?? '';
-      for (const part of parts) {
-        for (const line of part.split('\n')) {
-          const data = line.replace(/^data: /, '').trim();
-          if (!data || data === '[DONE]') continue;
-          try {
-            const json = JSON.parse(data);
-            if (json.error) {
-              yield { type: 'error', message: json.error.message ?? 'bynara error' };
-              return;
-            }
-            const delta = json.choices?.[0]?.delta;
-            if (delta?.content) {
-              yield { type: 'text_delta', text: delta.content };
-            } else if (delta?.tool_calls?.[0]) {
-              const tc = delta.tool_calls[0];
-              if (tc.function?.name) {
-                yield { type: 'tool_use', name: tc.function.name, input: JSON.parse(tc.function.arguments ?? '{}') };
-              }
-            } else if (json.choices?.[0]?.finish_reason === 'stop') {
-              yield { type: 'message_stop', reason: 'end_turn' };
-            }
-          } catch {
-            // skip malformed SSE frame
-          }
-        }
-      }
+    const json = await res.json();
+    if (json.error) {
+      yield { type: 'error', message: json.error.message ?? 'bynara error' };
+      return;
     }
+    const message = json.choices?.[0]?.message;
+    if (message?.content) {
+      yield { type: 'text_delta', text: message.content };
+    }
+    const toolCall = message?.tool_calls?.[0];
+    if (toolCall?.function?.name) {
+      yield { type: 'tool_use', name: toolCall.function.name, input: JSON.parse(toolCall.function.arguments ?? '{}') };
+    }
+    yield { type: 'message_stop', reason: 'end_turn' };
     const { recordUsage } = await import('@/lib/security/tokenBudget');
     const inputLen = input.messages.reduce((n, m) => n + m.content.length, 0) + (input.system?.length ?? 0);
     await recordUsage(Math.ceil(inputLen / 4) + 1024);
