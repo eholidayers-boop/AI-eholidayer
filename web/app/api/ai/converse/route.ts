@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { AnthropicProvider } from '@/lib/ai/anthropic';
+import { BynaraProvider } from '@/lib/ai/bynara';
 import { MockProvider } from '@/lib/ai/mock';
 import { runToolLoop, type ToolLoopResult } from '@/lib/ai/toolLoop';
 import { getSession, saveSession } from '@/lib/session/store';
@@ -15,6 +16,16 @@ function pickProvider(): AIProvider {
   const useMock = process.env.AI_PROVIDER === 'mock'
     && (process.env.ALLOW_MOCK_PROVIDER === 'true' || process.env.NODE_ENV !== 'production');
   if (useMock) return new MockProvider();
+  const provider = process.env.AI_PROVIDER;
+  if (provider === 'bynara') {
+    if (!process.env.BYNARA_API_KEY) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('BYNARA_API_KEY required in production');
+      }
+      return new MockProvider();
+    }
+    return new BynaraProvider(process.env.BYNARA_API_KEY);
+  }
   if (!process.env.ANTHROPIC_API_KEY) {
     if (process.env.NODE_ENV === 'production') {
       throw new Error('ANTHROPIC_API_KEY required in production');
