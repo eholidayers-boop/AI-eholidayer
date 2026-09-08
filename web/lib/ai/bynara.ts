@@ -19,7 +19,7 @@ export class BynaraProvider implements AIProvider {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`
+        'X-API-Key': this.apiKey
       },
       body: JSON.stringify({
         model: CHAT_MODEL,
@@ -54,6 +54,10 @@ export class BynaraProvider implements AIProvider {
           if (!data || data === '[DONE]') continue;
           try {
             const json = JSON.parse(data);
+            if (json.error) {
+              yield { type: 'error', message: json.error.message ?? 'bynara error' };
+              return;
+            }
             const delta = json.choices?.[0]?.delta;
             if (delta?.content) {
               yield { type: 'text_delta', text: delta.content };
@@ -83,7 +87,7 @@ export class BynaraProvider implements AIProvider {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`
+        'X-API-Key': this.apiKey
       },
       body: JSON.stringify({
         model: EXTRACT_MODEL,
