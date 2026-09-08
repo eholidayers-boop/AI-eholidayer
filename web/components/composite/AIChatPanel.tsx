@@ -71,7 +71,7 @@ export function AIChatPanel() {
       <ul className="space-y-3 mb-4" aria-live="polite">
         {messages.map((m, i) => (
           <li key={i} className={`p-3 rounded-md ${m.role === 'user' ? 'bg-accent-soft' : 'bg-bg-subtle'}`}>
-            <p className="whitespace-pre-wrap">{m.content || <Skeleton className="h-4 w-32 inline-block" />}</p>
+            <span className="whitespace-pre-wrap">{m.content || <Skeleton className="h-4 w-32 inline-block" />}</span>
             {m.hotels && m.hotels.length > 0 && (
               <ul className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {m.hotels.map(h => <li key={h.id}><HotelCard hotel={h} /></li>)}
